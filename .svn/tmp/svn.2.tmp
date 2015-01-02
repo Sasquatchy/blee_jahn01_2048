@@ -1,0 +1,79 @@
+/**
+ * 2048 (Projet JAVA - L3 Informatique)
+ * @author Bryan Lee (blee@etudiant.u-pem.fr)
+ * @author Jee Hoon Ahn (jahn01@etudiant.u-pem.fr)
+ */
+
+package fr.umlv.projet.game;
+
+import fr.umlv.projet.outil.Rng;
+
+public class Board {
+	private Case[][] board;
+
+	/** 
+	 * Class constructor.
+	 */
+	public Board() {
+		board = new Case[4][4];
+		/*todo amelioration*/
+		for(int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++ ){
+				board[i][j] = new Case();
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void startNewCase() {
+		Rng rand = new Rng();
+		int x = rand.getRandomIndex();
+		int y = rand.getRandomIndex();
+		while(!board[x][y].isZero()) {
+			/*
+			if(board[x][y].isZero()) {
+				board[x][y].start();
+			}*/
+			x = rand.getRandomIndex();
+			y = rand.getRandomIndex();
+		}
+		board[x][y].start();
+		//board[rand.getRandomPlaceExcept(x)][rand.getRandomPlaceExcept(y)].start();
+		
+	}
+	
+	/*methode for generate new case*/
+	/* declaration de la valeur du sens 0 = up 1 = right 2= down 3= left*/
+	/*
+	public void nextRound(int way){
+		
+	}
+	*/
+	
+	public void MoveLeft() {
+		for (int y = 0; y < 4; y++) {
+			for (int x = 0; x < 4 ; x++) {
+				boolean moved = false;
+				for(int i = x; i < 4; i++) {
+					if(board[x][y].isSameValue(board[i][y]) && !(board[x][y].isZero()) && moved == false){
+						board[x][y].levelUp();
+						board[i][y].reset();
+						moved = true;
+					}
+					if(board[x][y].isZero()) {
+						
+					}
+				}
+			}
+		}
+	}
+	
+	
+	/**/
+	
+	/*toString*/
+	
+	/*passer dun cote*/
+}

@@ -1,0 +1,100 @@
+/**
+ * 2048 (Projet JAVA - L3 Informatique)
+ * @author Bryan Lee (blee@etudiant.u-pem.fr)
+ * @author Jee Hoon Ahn (jahn01@etudiant.u-pem.fr)
+ */
+
+package fr.umlv.projet.game;
+
+import fr.umlv.projet.outil.Rng;
+
+public class Case {
+	private int level;
+	
+	/**
+	 * Class constructor
+	 */
+	public Case() {
+		level = 0;
+	}
+	
+	/**
+	 * Put a random level in level
+	 */
+	public void start() {
+		Rng random = new Rng();
+		level = random.getRandomLevel();
+	}
+	
+	public int getLevel(){
+		return level;
+	}
+	
+	void setLevel(int level){
+		this.level = level;
+	}
+	
+	/**
+	 * Double the level
+	 */
+	public void levelUp() {
+		level = level *2;
+	}
+	
+	/**
+	 * verify if the level in the case is the end number, 2048
+	 * @return true if case is 2048
+	 */
+	public boolean isEnd(){
+		return level == 2048;
+	}
+
+	/**
+	 * it test if the same value (only level)
+	 * @return true if level is equal 
+	 */
+	public boolean isSameValue(Case c) {
+		return this.level == c.level;
+	}
+
+	/**
+	 * if level is 0 return true
+	 * @return true if level == 0
+	 */
+	public boolean isZero() {
+		return level == 0;
+	}
+
+	/**
+	 * reset the level to 0
+	 */
+	public void reset() {
+		level = 0;
+	}
+		
+	/**
+	 * print an integer of level
+	 * @return string of level integer 
+	 */
+	@Override
+	public String toString(){
+		return Integer.toString(level);
+	}
+	
+	/**
+	 * test if the objects and values are same
+	 * @return true if objects and values are same
+	 */
+	@Override
+	public boolean equals(Object o) {
+    	if(o == this) {
+    		return true;
+    	}
+    	if(o instanceof Case) {
+    		Case test = (Case) o;
+    		if(this.level == test.level)
+    		return true;
+    	}
+    	return false;
+    }
+}

@@ -1,0 +1,156 @@
+/**
+ * 2048 (Projet JAVA - L3 Informatique)
+ * @author Bryan Lee (blee@etudiant.u-pem.fr)
+ * @author Jee Hoon Ahn (jahn01@etudiant.u-pem.fr)
+ */
+
+package fr.umlv.projet.game;
+
+import fr.umlv.projet.outil.Rng;
+import java.lang.StringBuilder;
+
+public class Board {
+	private Case[][] board;
+
+	/** 
+	 * Class constructor.
+	 */
+	public Board() {
+		board = new Case[4][4];
+		/*todo amelioration*/
+		for(int i = 0; i < 4; i++) {
+			for(int j = 0; j < 4; j++ ){
+				board[i][j] = new Case();
+			}
+		}
+	}
+
+	/**
+	 * this method will find the case with 0, and replace at that place by initial value
+	 */
+	public void startNewCase() {
+		Rng rand = new Rng();
+		int x = rand.getRandomIndex();
+		int y = rand.getRandomIndex();
+		while(!board[x][y].isZero()) {
+			x = rand.getRandomIndex();
+			y = rand.getRandomIndex();
+		}
+		board[x][y].start();
+	}
+	
+	/*methode for generate new case*/
+	/* declaration de la valeur du sens 0 = up 1 = right 2= down 3= left*/
+	/*
+	public void nextRound(int way){
+		
+	}
+	*/
+	
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for(int y = 0; y < 4; y++) {
+			for(int x = 0; x < 4; x++) {
+				builder.append(board[x][y].toString()).append(" ");
+			}
+			builder.append("\n");
+		}
+		return builder.toString();
+	}
+	
+	/**
+	 * move all case to left by following condition:
+	 * -if the case next to the actual case has same value but not zero, fusion them to double up
+	 * -if the actual case is zero but the next case is not zero ( has level > 0), replace it to actual case's place
+	 * -if the actual case and next case has zero, move to the head of the loop
+	 * @return if movement is not made false else true
+	 */
+	public boolean moveLeft() {
+		boolean moved = false;
+		/*all along the visit*/
+		for (int y = 0; y < 4; y++) {
+			for (int x = 0; x < 3 ; x++) {
+				/* the case when the next level is same but not zero
+				 * fusion them and set the next value to 0 
+				 */
+				if(board[x][y].isSameValue(board[x+1][y]) && !(board[x][y].isZero()) ){
+					board[x][y].levelUp();
+					board[x+1][y].reset();
+					moved = true;
+				}
+				/* the case when the level is zero but next level is not zero
+				 * move to actual place 
+				 */
+				if (board[x][y].isZero() && !board[x+1][y].isZero()) {
+					board[x][y].setLevel(board[x+1][y].getLevel());
+					board[x+1][y].reset();
+				}
+				/* the case when the level and the next level will be ignored
+				 * and pass to the next step ( rewind to the first) 
+				 */
+				
+			}
+		}
+		return moved ;
+	}
+	
+	public boolean moveRight() {
+		boolean moved = false;
+		for (int y = 0; y < 4; y++) {
+			for (int x = 3; x < 0 ; x--) {
+				if(board[x][y].isSameValue(board[x-1][y]) && !(board[x][y].isZero()) ){
+					board[x][y].levelUp();
+					board[x-1][y].reset();
+					moved = true;
+				}
+				if (board[x][y].isZero() && !board[x-1][y].isZero()) {
+					board[x][y].setLevel(board[x-1][y].getLevel());
+					board[x-1][y].reset();
+				}
+				
+			}
+		}
+		return moved ;
+	}
+	
+	public boolean moveUp() {
+		boolean moved = false;
+		for (int x = 0; x < 4; x++) {
+			for (int y = 0; y < 3 ; y++) {
+				if(board[x][y].isSameValue(board[x][y+1]) && !(board[x][y].isZero()) ){
+					board[x][y].levelUp();
+					board[x][y+1].reset();
+					moved = true;
+				}
+				if (board[x][y].isZero() && !board[x+1][y].isZero()) {
+					board[x][y].setLevel(board[x+1][y].getLevel());
+					board[x][y+1].reset();
+				}
+				
+			}
+		}
+		return moved ;
+	}
+
+	
+	public boolean moveDown() {
+		boolean moved = false;
+		for (int x = 0; x < 4; x++) {
+			for (int y = 3; y < 0 ; y--) {
+				if(board[x][y].isSameValue(board[x][y-1]) && !(board[x][y].isZero()) ){
+					board[x][y].levelUp();
+					board[x][y-1].reset();
+					moved = true;
+				}
+				if (board[x][y].isZero() && !board[x][y-1].isZero()) {
+					board[x][y].setLevel(board[x][y-1].getLevel());
+					board[x][y-1].reset();
+				}
+				
+			}
+		}
+		return moved ;
+	}
+}

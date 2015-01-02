@@ -1,0 +1,345 @@
+/**
+ * 2048 (Projet JAVA - L3 Informatique)
+ * @author Bryan Lee (blee@etudiant.u-pem.fr)
+ * @author Jee Hoon Ahn (jahn01@etudiant.u-pem.fr)
+ */
+
+package fr.umlv.projet.game;
+
+import fr.umlv.projet.outil.Rng;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.lang.StringBuilder;
+
+import javax.swing.JPanel;
+
+@SuppressWarnings("serial")
+public class Board extends JPanel {
+	private Case[][] board;
+	private static final int BOARD_SIZE = 490;
+	private static final int GRID_LINE = 14;
+
+	/**
+	 * Class constructor.
+	 */
+	public Board() {
+		board = new Case[4][4];
+		int size = Case.CASE_SIZE;	//Store the size of one case;
+		
+		for(int x = 0; x < 4; x++) {
+			for(int y = 0; y < 4; y++ ) {
+				this.board[x][y] = new Case();
+				//Set the case to its position
+				board[x][y].setCasePosition(GRID_LINE+x*(GRID_LINE+size),GRID_LINE+y*(GRID_LINE+size));
+			}
+		}
+	}
+	
+	/**
+	 * copy constructor
+	 */
+	private Board(Case[][] b) {
+		board = new Case[4][4];
+		for(int x = 0; x < 4; x++) {
+			for(int y = 0; y < 4; y++ ) {
+				board[x][y] = new Case(b[x][y]);	// copy the case
+				board[x][y].setCasePosition(b[x][y].getCasePosition());	// copy the casePosition
+			}
+		}
+	}
+
+	public Case[][] getBoard() {
+		return board;
+	}
+	/**
+	 * this method will find the case with 0, and replace at that place by initial value
+	 */
+	public void startNewCase() {
+		Rng rand = new Rng();
+		int x = rand.getRandomIndex();
+		int y = rand.getRandomIndex();
+		while(!board[x][y].isZero()) {
+			x = rand.getRandomIndex();
+			y = rand.getRandomIndex();
+		}
+		board[x][y].start();
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for(int y = 0; y < 4; y++) {
+			for(int x = 0; x < 4; x++) {
+				builder.append(board[x][y].toString()).append(" ");
+			}
+			builder.append("\n");
+		}
+		return builder.toString();
+	}
+	
+	/** move cases from depart to dest (destination).
+	 * used for the movement of any direction.
+	 * @param dest is the destination of the movement.
+	 * @param src is the Case where it start.
+	 * @return true if destination has 0 and depart has successfully moved to dest.
+	 */
+	private boolean moveCase(Case dest,Case depart) {
+		if(dest.isZero()){
+			dest.setLevel(depart.getLevel());
+			depart.reset();
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * fusion the 2 cases if they are same.
+	 * @param dest is the level which will be doubled when the 2 cases are same.
+	 * @param src is the level which will be reset when 2 cases are same.
+	 * @return true if fusion is applied, else false.
+	 */
+	private boolean fusionCase(Case dest, Case src){
+		if(dest.isSameValue(src) && !dest.isZero()) {
+			dest.levelUp();
+			src.reset();
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * move all cases in the board to left.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean moveCaseToLeft(){
+		boolean moved = false;
+		for(int y = 0; y < 4; y++){
+			for(int x = 0; x < 3; x++)	
+				for(int i = x; i <4; i++){
+					if(moveCase(board[x][y],board[i][y]))
+						moved = true;
+				}
+		}
+		return moved;
+	}
+	
+	/**
+	 * fusion every cases in the board to left.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean fusionCaseToLeft() {
+		boolean fusioned = false;
+		for(int y = 0; y < 4; y++){
+			for(int x = 0; x < 3; x++)	
+				fusionCase(board[x][y],board[x+1][y]);
+				fusioned = true;
+		}
+		
+		return fusioned;
+	}
+
+	/**
+	 * move all case to left if the next case has same value.
+	 * @return if movement is not made false else true
+	 */
+	public boolean moveLeft() {
+		boolean moved = false;
+		if(moveCaseToLeft()) {
+			moved = true;
+			if(fusionCaseToLeft()) {
+				moveCaseToLeft();
+			}
+		}		
+		return moved ;
+	}
+	
+	
+	/**
+	 * move all cases in the board to right.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean moveCaseToRight(){
+		boolean moved = false;
+		for(int y = 0; y < 4; y++){
+			for(int x = 3; x > 0; x--)	
+				for(int i = x; i >=0; i--){
+					if(moveCase(board[x][y],board[i][y]))
+						moved = true;
+				}
+		}
+		return moved;
+	}
+	
+	/**
+	 * fusion every cases in the board to right.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean fusionCaseToRight() {
+		boolean fusioned = false;
+		for(int y = 0; y < 4; y++){
+			for(int x = 3; x > 0; x--)	
+				fusionCase(board[x][y],board[x-1][y]);
+				fusioned = true;
+		}
+		
+		return fusioned;
+	}
+	
+	/**
+	 * move all case to right if the next case has same value.
+	 * @return if movement is not made false else true
+	 */
+	public boolean moveRight() {
+		boolean moved = false;
+		if(moveCaseToRight()) {
+			moved = true;
+			if(fusionCaseToRight()) {
+				moveCaseToRight();
+			}
+		}	
+		return moved ;
+	}
+	
+	
+	/**
+	 * move all cases in the board to Up.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean moveCaseToUp(){
+		boolean moved = false;
+		for(int x = 0; x < 4; x++)	
+			for(int y = 0; y < 3; y++){
+				for(int i = y; i < 4; i++){
+					if(moveCase(board[x][y],board[x][i]))
+						moved = true;
+				}
+		}
+		return moved;
+	}
+	
+	/**
+	 * fusion every cases in the board to Up.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean fusionCaseToUp() {
+		boolean fusioned = false;
+		for(int x = 0; x < 4; x++)	
+			for(int y = 0; y < 3; y++){
+				fusionCase(board[x][y],board[x][y+1]);
+				fusioned = true;
+		}
+		
+		return fusioned;
+	}
+	
+	/**
+	 * move all case to up if the next case has same value.
+	 * @return if movement is not made false else true
+	 */
+	public boolean moveUp() {
+		boolean moved = false;
+		if(moveCaseToUp()) {
+			moved = true;
+			if(fusionCaseToUp()) {
+				moveCaseToUp();
+			}
+		}	
+		return moved ;
+	}
+
+	
+	/**
+	 * move all cases in the board to Down.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean moveCaseToDown(){
+		boolean moved = false;
+		for(int x = 0; x < 4; x++)	
+			for(int y = 3; y > 0; y--){
+				for(int i = y; i >= 0; i--){
+					if(moveCase(board[x][y],board[x][i]))
+						moved = true;
+				}
+		}
+		return moved;
+	}
+	
+	/**
+	 * fusion every cases in the board to Down.
+	 * @return true if this method is applied, else false.
+	 */
+	private boolean fusionCaseToDown() {
+		boolean fusioned = false;
+		for(int x = 0; x < 4; x++)	
+			for(int y = 3; y > 0; y--){
+				fusionCase(board[x][y],board[x][y-1]);
+				fusioned = true;
+		}
+		
+		return fusioned;
+	}
+	/**
+	 * move all case to down if the next case has same value.
+	 * @return if movement is not made false else true
+	 */
+	public boolean moveDown() {
+		boolean moved = false;
+		if(moveCaseToDown()) {
+			moved = true;
+			if(fusionCaseToDown()) {
+				moveCaseToDown();
+			}
+		}	
+		return moved ;
+	}
+	
+	/**
+	 * this method verifies if the player wins.
+	 * @return true if the player successfully make one 2048, else false.
+	 */
+	public boolean isWin(){
+		for(int x = 0; x < 4; x++) {
+			for(int y = 0; y < 4; y++) {
+				if(board[x][y].isWin()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * this method verify if the game is lost.
+	 * @return the boolean value of lost if the game is lost, it returns true, else false.
+	 */
+	public boolean isLost() {
+		boolean full = false;
+		boolean lost = false;
+		for(int x = 0; x < 4; x++) {
+			for(int y = 0; y < 4; y++) {
+				full = !(board[x][y].isZero());
+			}
+		}
+		if(full){
+			Board b = new Board(board);
+			lost = !(b.moveLeft() || b.moveRight() || b.moveUp() || b.moveDown());
+		}
+		return lost;
+	}
+	
+	/*  Graphic functions for Board class *****************************/
+	
+	/**
+	 * How the board should be drawn
+	 * @param g		abstract base object for all graphics contexts
+	 */
+	public void paintComponent( Graphics g ) {
+		g.setColor(new Color(158,137,118)); 		//Set color of the grid
+		g.fillRect(0, 0, BOARD_SIZE, BOARD_SIZE);	//Draw background of the grid
+		
+		for( int x=0; x<4; x++ )					//For each Case in the board
+			for ( int y=0; y<4; y++ )
+				board[x][y].paintComponent(g);
+	}
+}

@@ -1,0 +1,73 @@
+/**
+ * 2048 (Projet JAVA - L3 Informatique)
+ * @author Bryan Lee (blee@etudiant.u-pem.fr)
+ * @author Jee Hoon Ahn (jahn01@etudiant.u-pem.fr)
+ */
+
+package fr.umlv.projet.game;
+
+import fr.umlv.projet.outil.Rng;
+
+public class Case {
+	private int level;
+	
+	/**
+	 * Class constructor
+	 */
+	public Case() {
+		level = 0;
+	}
+	
+	/**
+	 * Put a random level in level
+	 */
+	public void start() {
+		Rng random = new Rng();
+		level = random.getRandomLevel();
+	}
+	
+	public int getLevel(){
+		return level;
+	}
+	
+	/**
+	 * Double the level
+	 */
+	public void levelUp() {
+		level = level *2;
+	}
+	
+	public boolean isEnd(){
+		return level == 2048;
+	}
+
+	public boolean isSameValue(Case c) {
+		return this.level == c.level;
+	}
+
+	public boolean isZero() {
+		return level == 0;
+	}
+
+	public void reset() {
+		level = 0;
+	}
+		 
+	@Override
+	public String toString(){
+		return "Case = " + Integer.toString(level);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+    	if(o == this) {
+    		return true;
+    	}
+    	if(o instanceof Case) {
+    		Case test = (Case) o;
+    		if(this.level == test.level)
+    		return true;
+    	}
+    	return false;
+    }
+}
